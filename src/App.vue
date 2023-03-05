@@ -8,6 +8,14 @@ export default {
   },
   mounted() {
     console.log(this.todos)
+  },
+  computed: {
+    countActiveTodos() {
+      return this.todos.filter(todo => !todo.completed).length
+    },
+    countCompletedTodos() {
+      return this.todos.filter(todo => todo.completed).length
+    }
   }
 }
 </script>
@@ -18,7 +26,9 @@ export default {
 
     <div class="todoapp__content">
       <header class="todoapp__header">
-        <button class="todoapp__toggle-all active"></button>
+        <button class="todoapp__toggle-all"
+        :class="{active: countActiveTodos}"
+        ></button>
 
         <form>
           <input type="text" class="todoapp__new-todo" placeholder="What needs to be done?" />
@@ -75,7 +85,7 @@ export default {
       </section>
 
       <footer class="todoapp__footer">
-        <span class="todo-count"> 3 items left </span>
+        <span class="todo-count"> {{countActiveTodos}} items left </span>
 
         <nav class="filter">
           <a href="#/" class="filter__link selected"> All </a>
@@ -85,7 +95,7 @@ export default {
           <a href="#/completed" class="filter__link"> Completed </a>
         </nav>
 
-        <button class="todoapp__clear-completed">Clear completed</button>
+        <button class="todoapp__clear-completed" v-if="countCompletedTodos > 0">Clear completed</button>
       </footer>
     </div>
 
