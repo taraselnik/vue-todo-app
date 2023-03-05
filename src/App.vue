@@ -3,7 +3,8 @@ import todos from './data/todos'
 export default {
   data() {
     return {
-      todos
+      todos,
+      newTodo: ''
     }
   },
   mounted() {
@@ -15,6 +16,16 @@ export default {
     },
     countCompletedTodos() {
       return this.todos.filter(todo => todo.completed).length
+    }
+  },
+  methods: {
+    handleSubmit() {
+      this.todos.push({
+        id: Date.now(),
+        title: this.newTodo,
+        completed: false
+      })
+      this.newTodo = ''
     }
   }
 }
@@ -30,8 +41,13 @@ export default {
         :class="{active: countActiveTodos}"
         ></button>
 
-        <form>
-          <input type="text" class="todoapp__new-todo" placeholder="What needs to be done?" />
+        <form @submit.prevent="handleSubmit">
+          <input
+            type="text"
+            class="todoapp__new-todo"
+            placeholder="What needs to be done?"
+            v-model="newTodo"
+          />
         </form>
       </header>
 
