@@ -1,66 +1,45 @@
+<script>
+import todos from './data/todos'
+export default {
+  data() {
+    return {
+      todos
+    }
+  },
+  mounted() {
+    console.log(this.todos)
+  }
+}
+</script>
+
 <template>
   <div class="todoapp">
-    <h1 class="todoapp__title">todos</h1>
+    <h1 class="todoapp__title">{todos}</h1>
 
     <div class="todoapp__content">
       <header class="todoapp__header">
         <button class="todoapp__toggle-all active"></button>
 
         <form>
-          <input
-            type="text"
-            class="todoapp__new-todo"
-            placeholder="What needs to be done?"
-          />
+          <input type="text" class="todoapp__new-todo" placeholder="What needs to be done?" />
         </form>
       </header>
 
       <section class="todoapp__main">
-        <div class="todo completed">
+        <div v-for="todo, index of todos"
+        :key="todo.id"
+        class="todo"
+        :class="{completed: todo.completed}"
+        >
           <label class="todo__status-label">
             <input
               type="checkbox"
               class="todo__status"
-              checked
+              v-model="todo.completed"
             />
           </label>
 
-          <span class="todo__title">Completed Todo</span>
-
-          <button class="todo__remove">x</button>
-
-          <div class="modal overlay">
-            <div class="modal-background has-background-white-ter"></div>
-            <div class="loader"></div>
-          </div>
-        </div>
-
-        <div class="todo">
-          <label class="todo__status-label">
-            <input
-              type="checkbox"
-              class="todo__status"
-            />
-          </label>
-
-          <span class="todo__title">Not Completed Todo</span>
-          <button class="todo__remove">x</button>
-
-          <div class="modal overlay">
-            <div class="modal-background has-background-white-ter"></div>
-            <div class="loader"></div>
-          </div>
-        </div>
-
-        <div class="todo">
-          <label class="todo__status-label">
-            <input
-              type="checkbox"
-              class="todo__status"
-            />
-          </label>
-
-          <form>
+          <form v-if="undefined">
             <input
               type="text"
               class="todo__title-field"
@@ -69,7 +48,12 @@
             />
           </form>
 
-          <div class="modal overlay">
+          <template v-else>
+            <span class="todo__title">{{ todo.title }} {{ index }}</span>
+            <button class="todo__remove" v-on:click="todos.splice(index, 1)">x</button>
+          </template>
+
+          <div class="modal overlay" :class="{'is-active' : false}">
             <div class="modal-background has-background-white-ter"></div>
             <div class="loader"></div>
           </div>
@@ -77,10 +61,7 @@
 
         <div class="todo">
           <label class="todo__status-label">
-            <input
-              type="checkbox"
-              class="todo__status"
-            />
+            <input type="checkbox" class="todo__status" />
           </label>
 
           <span class="todo__title">Todo is being saved now</span>
@@ -94,36 +75,17 @@
       </section>
 
       <footer class="todoapp__footer">
-        <span class="todo-count">
-          3 items left
-        </span>
+        <span class="todo-count"> 3 items left </span>
 
         <nav class="filter">
-          <a
-            href="#/"
-            class="filter__link selected"
-          >
-            All
-          </a>
+          <a href="#/" class="filter__link selected"> All </a>
 
-          <a
-            href="#/active"
-            class="filter__link"
-          >
-            Active
-          </a>
+          <a href="#/active" class="filter__link"> Active </a>
 
-          <a
-            href="#/completed"
-            class="filter__link"
-          >
-            Completed
-          </a>
+          <a href="#/completed" class="filter__link"> Completed </a>
         </nav>
 
-        <button class="todoapp__clear-completed">
-          Clear completed
-        </button>
+        <button class="todoapp__clear-completed">Clear completed</button>
       </footer>
     </div>
 
@@ -133,9 +95,7 @@
         <button class="delete"></button>
       </div>
 
-      <div class="message-body">
-        Unable to add a Todo
-      </div>
+      <div class="message-body">Unable to add a Todo</div>
     </article>
   </div>
 </template>
