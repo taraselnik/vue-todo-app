@@ -1,40 +1,52 @@
 <script>
-import todosIn from './data/todos';
-import StatusFilter from './components/StatusFilter.vue';
-import TodoItem from './components/TodoItem.vue';
+import todosIn from './data/todos'
+import StatusFilter from './components/StatusFilter.vue'
+import TodoItem from './components/TodoItem.vue'
 
 export default {
   components: {
     StatusFilter,
     TodoItem
-},
+  },
   data() {
-    let todos = [];
-    const jsonData = localStorage.getItem('todos');
+    let todos = []
+    const jsonData = localStorage.getItem('todos')
     try {
-      let temp = JSON.parse(jsonData);
+      let temp = JSON.parse(jsonData)
       if (temp) {
-        todos = temp;
+        todos = temp
       } else {
-        todos = todosIn;
+        todos = todosIn
       }
-    } catch (e) {[]};
+    } catch (e) {
+      ;[]
+    }
 
     return {
       todos,
       newTodo: '',
-      statusFilter: 'all',
+      statusFilter: 'all'
     }
   },
   mounted() {
     console.log(this.todos)
   },
   computed: {
-    countActiveTodos() {
-      return this.todos.filter(todo => !todo.completed).length
+    activeTodos() {
+      return this.todos.filter((todo) => !todo.completed)
     },
-    countCompletedTodos() {
-      return this.todos.filter(todo => todo.completed).length
+    completedTodos() {
+      return this.todos.filter((todo) => todo.completed)
+    },
+    visibleTodos() {
+      switch (this.statusFilter) {
+        case 'active':
+          return this.activeTodos
+        case 'completed':
+          return this.completedTodos
+        default:
+          return this.todos
+      }
     }
   },
   watch: {
@@ -65,9 +77,7 @@ export default {
 
     <div class="todoapp__content">
       <header class="todoapp__header">
-        <button class="todoapp__toggle-all"
-        :class="{active: countActiveTodos}"
-        ></button>
+        <button class="todoapp__toggle-all" :class="{ active: activeTodos }"></button>
 
         <form @submit.prevent="handleSubmit">
           <input
@@ -79,13 +89,13 @@ export default {
         </form>
       </header>
 
-      <section class="todoapp__main">
+      <TransitionGroup name="list" tag="section" class="todoapp__main">
         <TodoItem
-          v-for="todo, index of todos"
+          v-for="(todo) of visibleTodos"
           :key="todo.id"
           :todo="todo"
-          @update="todos[index] = $event"
-          @remove="todos.splice(index, 1)"
+          @update="Object.assign(todo, $event)"
+          @remove="todos.splice(todos.indexOf(todo), 1)"
         />
         <!-- <div
           v-for="todo, index of todos"
@@ -134,16 +144,16 @@ export default {
             <div class="loader"></div>
           </div>
         </div>
-      </section>
+      </TransitionGroup>
 
       <footer class="todoapp__footer">
-        <span class="todo-count"> {{countActiveTodos}} items left </span>
+        <span class="todo-count"> {{ activeTodos.length }} items left </span>
 
-        <StatusFilter
-          v-model="statusFilter"
-        />
+        <StatusFilter v-model="statusFilter" />
 
-        <button class="todoapp__clear-completed" v-if="countCompletedTodos > 0">Clear completed</button>
+        <button class="todoapp__clear-completed" v-if="completedTodos.length">
+          Clear completed
+        </button>
       </footer>
     </div>
 
@@ -157,3 +167,18 @@ export default {
     </article>
   </div>
 </template>
+
+<style>
+.list-enter-active,
+.list-leave-active {
+  max-height: 60px;
+  transition: all 0.3s ease;
+}
+.list-enter-from,
+.list-leave-to {
+
+  opacity: 0;
+  max-height: 0;
+  transform: scaleY(0);
+}
+</style>
