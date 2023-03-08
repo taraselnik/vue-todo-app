@@ -1,10 +1,29 @@
 <script>
-import todos from './data/todos'
+import todosIn from './data/todos';
+import StatusFilter from './components/StatusFilter.vue';
+import TodoItem from './components/TodoItem.vue';
+
 export default {
+  components: {
+    StatusFilter,
+    TodoItem
+},
   data() {
+    let todos = [];
+    const jsonData = localStorage.getItem('todos');
+    try {
+      let temp = JSON.parse(jsonData);
+      if (temp) {
+        todos = temp;
+      } else {
+        todos = todosIn;
+      }
+    } catch (e) {[]};
+
     return {
       todos,
-      newTodo: ''
+      newTodo: '',
+      statusFilter: 'all',
     }
   },
   mounted() {
@@ -16,6 +35,15 @@ export default {
     },
     countCompletedTodos() {
       return this.todos.filter(todo => todo.completed).length
+    }
+  },
+  watch: {
+    todos: {
+      deep: true,
+      handler() {
+        console.log(this.todos.length)
+        localStorage.setItem('todos', JSON.stringify(this.todos))
+      }
     }
   },
   methods: {
@@ -52,10 +80,18 @@ export default {
       </header>
 
       <section class="todoapp__main">
-        <div v-for="todo, index of todos"
-        :key="todo.id"
-        class="todo"
-        :class="{completed: todo.completed}"
+        <TodoItem
+          v-for="todo, index of todos"
+          :key="todo.id"
+          :todo="todo"
+          @update="todos[index] = $event"
+          @remove="todos.splice(index, 1)"
+        />
+        <!-- <div
+          v-for="todo, index of todos"
+          :key="todo.id"
+          class="todo"
+          :class="{completed: todo.completed}"
         >
           <label class="todo__status-label">
             <input
@@ -83,7 +119,7 @@ export default {
             <div class="modal-background has-background-white-ter"></div>
             <div class="loader"></div>
           </div>
-        </div>
+        </div> -->
 
         <div class="todo">
           <label class="todo__status-label">
@@ -103,13 +139,9 @@ export default {
       <footer class="todoapp__footer">
         <span class="todo-count"> {{countActiveTodos}} items left </span>
 
-        <nav class="filter">
-          <a href="#/" class="filter__link selected"> All </a>
-
-          <a href="#/active" class="filter__link"> Active </a>
-
-          <a href="#/completed" class="filter__link"> Completed </a>
-        </nav>
+        <StatusFilter
+          v-model="statusFilter"
+        />
 
         <button class="todoapp__clear-completed" v-if="countCompletedTodos > 0">Clear completed</button>
       </footer>
