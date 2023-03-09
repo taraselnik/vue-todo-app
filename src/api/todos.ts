@@ -19,14 +19,13 @@ export const createTodos = (title) => {
   })
 }
 
-export const updateTodo = ({id, title, completed}) => {
+export const updateTodo = ({ id, title, completed }) => {
   return client.patch(`/todos/${id}`, {
     title,
     completed,
   })
 }
 
-
-getTodos().then(res => {
-  console.log('TODOS file', res.data)
-})
+export const deleteTodo = (todoId) => {
+  return client.delete(`/todos/${todoId}`)
+}

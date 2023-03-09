@@ -1,5 +1,5 @@
 <script>
-import todosIn from './data/todos'
+import { getTodos, createTodos, updateTodo, deleteTodo } from './api/todos.ts'
 import StatusFilter from './components/StatusFilter.vue'
 import TodoItem from './components/TodoItem.vue'
 
@@ -9,27 +9,16 @@ export default {
     TodoItem
   },
   data() {
-    let todos = []
-    const jsonData = localStorage.getItem('todos')
-    try {
-      let temp = JSON.parse(jsonData)
-      if (temp) {
-        todos = temp
-      } else {
-        todos = todosIn
-      }
-    } catch (e) {
-      ;[]
-    }
+    // let todos = []
+    // const jsonData = localStorage.getItem('todos')
+    // let temp = JSON.parse(jsonData)
+    // todos = todosIn
 
     return {
-      todos,
-      newTodo: '',
+      todos: [],
+      titleNewTodo: '',
       statusFilter: 'all'
     }
-  },
-  mounted() {
-    console.log(this.todos)
   },
   computed: {
     activeTodos() {
@@ -49,23 +38,50 @@ export default {
       }
     }
   },
-  watch: {
-    todos: {
-      deep: true,
-      handler() {
-        console.log(this.todos.length)
-        localStorage.setItem('todos', JSON.stringify(this.todos))
-      }
-    }
+  // watch: {
+  //   todos: {
+  //     deep: true,
+  //     handler() {
+  //       console.log(this.todos.length)
+  //       localStorage.setItem('todos', JSON.stringify(this.todos))
+  //     }
+  //   }
+  // },
+  mounted() {
+    getTodos().then((res) => {
+      console.log(res)
+      this.todos = res.data
+    })
   },
+
   methods: {
     handleSubmit() {
-      this.todos.push({
-        id: Date.now(),
-        title: this.newTodo,
-        completed: false
+      // this.todos.push({
+      //   id: Date.now(),
+      //   title: this.titleNewTodo,
+      //   completed: false
+      // })
+
+      createTodos(this.titleNewTodo)
+        .then((res) => {
+          console.log(res)
+          this.todos = [...this.todos, res.data]
+          this.titleNewTodo = ''
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+      this.titleNewTodo = ''
+    },
+
+    updateTodo({ id, title, completed }) {
+      updateTodo({ id, title, completed }).then((res) => {
+        this.todos = this.todos.map((todo) => (todo.id === id ? res.data : todo))
       })
-      this.newTodo = ''
+    },
+
+    deleteTodo(id) {
+      deleteTodo(id).then(() => (this.todos = this.todos.filter((todo) => todo.id !== id)))
     }
   }
 }
@@ -84,54 +100,21 @@ export default {
             type="text"
             class="todoapp__new-todo"
             placeholder="What needs to be done?"
-            v-model="newTodo"
+            v-model="titleNewTodo"
           />
         </form>
       </header>
 
       <TransitionGroup name="list" tag="section" class="todoapp__main">
         <TodoItem
-          v-for="(todo) of visibleTodos"
+          v-for="todo of visibleTodos"
           :key="todo.id"
           :todo="todo"
-          @update="Object.assign(todo, $event)"
-          @remove="todos.splice(todos.indexOf(todo), 1)"
+          @update="updateTodo"
+          @remove="deleteTodo(todo.id)"
         />
-        <!-- <div
-          v-for="todo, index of todos"
-          :key="todo.id"
-          class="todo"
-          :class="{completed: todo.completed}"
-        >
-          <label class="todo__status-label">
-            <input
-              type="checkbox"
-              class="todo__status"
-              v-model="todo.completed"
-            />
-          </label>
 
-          <form v-if="undefined">
-            <input
-              type="text"
-              class="todo__title-field"
-              placeholder="Empty todo will be deleted"
-              value="Todo is being edited now"
-            />
-          </form>
-
-          <template v-else>
-            <span class="todo__title">{{ todo.title }} {{ index }}</span>
-            <button class="todo__remove" v-on:click="todos.splice(index, 1)">x</button>
-          </template>
-
-          <div class="modal overlay" :class="{'is-active' : false}">
-            <div class="modal-background has-background-white-ter"></div>
-            <div class="loader"></div>
-          </div>
-        </div> -->
-
-        <div class="todo">
+        <div class="todo" key="footer">
           <label class="todo__status-label">
             <input type="checkbox" class="todo__status" />
           </label>
@@ -172,11 +155,10 @@ export default {
 .list-enter-active,
 .list-leave-active {
   max-height: 60px;
-  transition: all 0.3s ease;
+  transition: all 0.15s ease;
 }
 .list-enter-from,
 .list-leave-to {
-
   opacity: 0;
   max-height: 0;
   transform: scaleY(0);
