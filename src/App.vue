@@ -1,12 +1,14 @@
 <script>
-import { getTodos, createTodos, updateTodo, deleteTodo } from './api/todos.ts'
-import StatusFilter from './components/StatusFilter.vue'
-import TodoItem from './components/TodoItem.vue'
+import { getTodos, createTodos, updateTodo, deleteTodo } from './api/todos.ts';
+import StatusFilter from './components/StatusFilter.vue';
+import TodoItem from './components/TodoItem.vue';
+import Message from './components/Message.vue';
 
 export default {
   components: {
     StatusFilter,
-    TodoItem
+    TodoItem,
+    Message,
   },
   data() {
     // let todos = []
@@ -17,7 +19,8 @@ export default {
     return {
       todos: [],
       titleNewTodo: '',
-      statusFilter: 'all'
+      statusFilter: 'all',
+      errorMessage: '',
     }
   },
   computed: {
@@ -48,10 +51,14 @@ export default {
   //   }
   // },
   mounted() {
-    getTodos().then((res) => {
+    getTodos()
+      .then((res) => {
       console.log(res)
       this.todos = res.data
-    })
+      })
+      .catch(() => {
+        this.errorMessage = 'Unable to load todo list'
+      })
   },
 
   methods: {
@@ -115,12 +122,12 @@ export default {
         />
 
         <div class="todo" key="footer">
-          <label class="todo__status-label">
+          <!-- <label class="todo__status-label">
             <input type="checkbox" class="todo__status" />
-          </label>
+          </label> -->
 
-          <span class="todo__title">Todo is being saved now</span>
-          <button class="todo__remove">x</button>
+          <!-- <span class="todo__title">Todo is being saved now</span> -->
+          <!-- <button class="todo__remove">x</button> -->
 
           <div class="modal overlay is-active">
             <div class="modal-background has-background-white-ter"></div>
@@ -140,14 +147,16 @@ export default {
       </footer>
     </div>
 
-    <article class="message is-danger message--hidden">
-      <div class="message-header">
-        <p>Error</p>
-        <button class="delete"></button>
-      </div>
+    <Message class="is-warning" :active="errorMessage">
 
-      <div class="message-body">Unable to add a Todo</div>
-    </article>
+      <template #default="{ x }">
+        <p>{{ errorMessage }} {{ x }}</p>
+      </template>
+
+      <template #header>
+        <p>Server error</p>
+      </template>
+    </Message>
   </div>
 </template>
 

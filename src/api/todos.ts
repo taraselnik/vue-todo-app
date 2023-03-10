@@ -9,6 +9,7 @@ import { client } from '../client/httpClient'
 
 export const getTodos = () => {
   return client.get('/todos?userId=6342')
+    .then(() => Promise.reject(new Error))
 }
 
 export const createTodos = (title) => {
