@@ -89,6 +89,15 @@ export default {
 
     deleteTodo(id) {
       deleteTodo(id).then(() => (this.todos = this.todos.filter((todo) => todo.id !== id)))
+    },
+
+    deleteAllCompleted() {
+      this.todos.forEach(async todo => {
+        if (todo.completed) {
+          await this.deleteTodo(todo.id)
+        }
+      })
+
     }
   }
 }
@@ -141,7 +150,11 @@ export default {
 
         <StatusFilter v-model="statusFilter" />
 
-        <button class="todoapp__clear-completed" v-if="completedTodos.length">
+        <button
+          class="todoapp__clear-completed"
+          v-if="completedTodos.length"
+          @click="deleteAllCompleted"
+        >
           Clear completed
         </button>
       </footer>
