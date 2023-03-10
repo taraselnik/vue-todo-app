@@ -147,7 +147,11 @@ export default {
       </footer>
     </div>
 
-    <Message class="is-warning" :active="errorMessage">
+    <Message
+      class="is-warning"
+      :active="errorMessage !== ''"
+      @hide="errorMessage = ''"
+    >
 
       <template #default="{ x }">
         <p>{{ errorMessage }} {{ x }}</p>

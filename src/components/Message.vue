@@ -1,9 +1,17 @@
 <script>
 
 export default {
+  name: "item-error-loading",
+  emits: ['hide'],
   props: {
     active: Boolean,
   },
+  methods: {
+    closeWarning() {
+      this.$emit('hide')
+    }
+  }
+
 }
 </script>
 
@@ -13,7 +21,7 @@ export default {
     <div class="message-header">
       <slot name="header"></slot>
 
-      <button class="delete"></button>
+      <button class="delete" @click="closeWarning"></button>
     </div>
 
     <div class="message-body">
