@@ -10,7 +10,7 @@ export default {
   data() {
     return {
       editing: false,
-      newTitle: this.todo.title
+      newTitle: this.todo.title,
     }
   },
   methods: {
@@ -46,7 +46,12 @@ export default {
       this.$nextTick(() => {
         this.$refs['title-field'].focus()
       })
+    },
+
+    escapeFocused() {
+      this.editing = !this.editing
     }
+
   }
 }
 </script>
@@ -64,22 +69,17 @@ export default {
         placeholder="Empty todo will be deleted"
         v-model.trim="newTitle"
         ref="title-field"
-        @keyup.esc="edit"
+        @keyup.esc="escapeFocused"
         @dblclick="rename"
-        @blur="edit"
+        @blur="escapeFocused"
       />
-      <button class="todo__remove" @click="rename">save</button>
+      <button class="todo__remove" @mousedown="rename">save</button>
     </form>
 
     <template v-else>
       <span class="todo__title" @dblclick="edit"> {{ todo.title }}</span>
       <button class="todo__remove" @click="deleteTodo">x</button>
     </template>
-
-    <div class="modal overlay" :class="{ 'is-active': false }">
-      <div class="modal-background has-background-white-ter"></div>
-      <div class="loader"></div>
-    </div>
   </div>
 </template>
 

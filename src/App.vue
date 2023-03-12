@@ -1,26 +1,23 @@
 <script>
-import { getTodos, createTodos, updateTodo, deleteTodo } from './api/todos.ts';
-import StatusFilter from './components/StatusFilter.vue';
-import TodoItem from './components/TodoItem.vue';
-import Message from './components/Message.vue';
+import { getTodos, createTodos, updateTodo, deleteTodo } from './api/todos.ts'
+import StatusFilter from './components/StatusFilter.vue'
+import TodoItem from './components/TodoItem.vue'
+import Message from './components/Message.vue'
 
 export default {
   components: {
     StatusFilter,
     TodoItem,
-    Message,
+    Message
   },
   data() {
-    // let todos = []
-    // const jsonData = localStorage.getItem('todos')
-    // let temp = JSON.parse(jsonData)
-    // todos = todosIn
-
     return {
       todos: [],
       titleNewTodo: '',
       statusFilter: 'all',
       errorMessage: '',
+      todosBeforeToggle: [],
+      isLoaded: false,
     }
   },
   computed: {
@@ -53,8 +50,9 @@ export default {
   mounted() {
     getTodos()
       .then((res) => {
-      console.log(res)
-      this.todos = res.data
+        console.log(res)
+        this.todos = res.data
+        this.isLoaded = true
       })
       .catch(() => {
         this.errorMessage = 'Unable to load todo list'
@@ -63,12 +61,9 @@ export default {
 
   methods: {
     handleSubmit() {
-      // this.todos.push({
-      //   id: Date.now(),
-      //   title: this.titleNewTodo,
-      //   completed: false
-      // })
-
+      if (this.titleNewTodo.length === 0) {
+        return
+      }
       createTodos(this.titleNewTodo)
         .then((res) => {
           console.log(res)
@@ -92,12 +87,32 @@ export default {
     },
 
     deleteAllCompleted() {
-      this.todos.forEach(async todo => {
+      this.todos.forEach(async (todo) => {
         if (todo.completed) {
           await this.deleteTodo(todo.id)
         }
       })
+    },
 
+    allToggle() {
+      if (this.todos.length > 0 && this.todos[0].completed !== undefined) {
+        const isEveryLikeFirst = this.todos.every(
+          (todo) => todo.completed === this.todos[0].completed
+        )
+        if (isEveryLikeFirst) {
+          this.todos = this.todos.map((todo) => {
+            return { ...todo, completed: !todo.completed }
+          })
+        } else {
+          this.todos = this.todos.map((todo) => {
+            return { ...todo, completed: true }
+          })
+        }
+      }
+      console.log(this.todos)
+      this.todos.forEach(async (todo) => {
+        await updateTodo(todo)
+      })
     }
   }
 }
@@ -109,19 +124,23 @@ export default {
 
     <div class="todoapp__content">
       <header class="todoapp__header">
-        <button class="todoapp__toggle-all" :class="{ active: activeTodos }"></button>
+        <button
+          class="todoapp__toggle-all"
+          :class="{ active: activeTodos.length > 0 }"
+          @click="allToggle"
+        ></button>
 
         <form @submit.prevent="handleSubmit">
           <input
             type="text"
             class="todoapp__new-todo"
             placeholder="What needs to be done?"
-            v-model="titleNewTodo"
+            v-model.trim="titleNewTodo"
           />
         </form>
       </header>
 
-      <TransitionGroup name="list" tag="section" class="todoapp__main">
+      <TransitionGroup name="list" tag="section" class="todoapp__main" v-if = "isLoaded">
         <TodoItem
           v-for="todo of visibleTodos"
           :key="todo.id"
@@ -129,21 +148,23 @@ export default {
           @update="updateTodo"
           @remove="deleteTodo(todo.id)"
         />
+      </TransitionGroup>
 
-        <div class="todo" key="footer">
-          <!-- <label class="todo__status-label">
+      <section class="todoapp__main" v-else>
+        <div class="todo">
+          <label class="todo__status-label">
             <input type="checkbox" class="todo__status" />
-          </label> -->
+          </label>
 
-          <!-- <span class="todo__title">Todo is being saved now</span> -->
-          <!-- <button class="todo__remove">x</button> -->
+          <span class="todo__title">loading...</span>
+          <button class="todo__remove">x</button>
 
           <div class="modal overlay is-active">
             <div class="modal-background has-background-white-ter"></div>
             <div class="loader"></div>
           </div>
         </div>
-      </TransitionGroup>
+      </section>
 
       <footer class="todoapp__footer">
         <span class="todo-count"> {{ activeTodos.length }} items left </span>
@@ -160,12 +181,7 @@ export default {
       </footer>
     </div>
 
-    <Message
-      class="is-warning"
-      :active="errorMessage !== ''"
-      @hide="errorMessage = ''"
-    >
-
+    <Message class="is-warning" :active="errorMessage !== ''" @hide="errorMessage = ''">
       <template #default="{ x }">
         <p>{{ errorMessage }} {{ x }}</p>
       </template>
