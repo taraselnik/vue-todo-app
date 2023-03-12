@@ -1,6 +1,7 @@
 # vue3-todo-app
+## Add, delete, rename todos with API
 
-This template should help get you started developing with Vue 3 in Vite.
+[DEMO LINK](https://taraselnik.github.io/vue-todo-app/)
 
 ## Recommended IDE Setup
 
