@@ -61,7 +61,7 @@ export default {
 <template>
   <div class="todo" :class="{ completed: itemStatus }">
     <label class="todo__status-label">
-      <input type="checkbox" class="todo__status" :checked="todo.completed" @change="toggle" />
+      <input type="checkbox" class="todo__status" :checked="todo.completed" @change="toggle" @touchstart="toggle" />
     </label>
 
     <form v-if="editing" @submit.prevent="rename">
