@@ -49,7 +49,7 @@ export default {
     },
 
     escapeFocused() {
-      this.editing = !this.editing
+      this.editing = false
     }
 
   }
@@ -59,7 +59,7 @@ export default {
 <template>
   <div class="todo" :class="{ completed: todo.completed }">
     <label class="todo__status-label">
-      <input type="checkbox" class="todo__status" :checked="todo.completed" @click="toggle" />
+      <input type="checkbox" class="todo__status" :checked="todo.completed" @change="toggle" />
     </label>
 
     <form v-if="editing" @submit.prevent="rename">
@@ -70,14 +70,13 @@ export default {
         v-model.trim="newTitle"
         ref="title-field"
         @keyup.esc="escapeFocused"
-        @dblclick="rename"
         @blur="escapeFocused"
       />
       <button class="todo__remove" @mousedown="rename">save</button>
     </form>
 
     <template v-else>
-      <span class="todo__title" @dblclick="edit"> {{ todo.title }}</span>
+      <span class="todo__title" @click="edit"> {{ todo.title }}</span>
       <button class="todo__remove" @click="deleteTodo">x</button>
     </template>
   </div>
