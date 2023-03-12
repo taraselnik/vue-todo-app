@@ -10,11 +10,13 @@ export default {
   data() {
     return {
       editing: false,
-      newTitle: this.todo.title
+      newTitle: this.todo.title,
+      itemStatus: this.todo.completed
     }
   },
   methods: {
     toggle() {
+      this.itemStatus = !this.itemStatus
       this.$emit('update', {
         ...this.todo,
         completed: !this.todo.completed
@@ -51,14 +53,15 @@ export default {
     escapeFocused() {
       this.editing = false
     }
+
   }
 }
 </script>
 
 <template>
-  <div class="todo" :class="{ completed: todo.completed }">
-    <label class="todo__status-label" @click="toggle">
-      <button class="todo__status" :checked="todo.completed" ></button>
+  <div class="todo" :class="{ completed: itemStatus }">
+    <label class="todo__status-label">
+      <input type="checkbox" class="todo__status" :checked="todo.completed" @change="toggle" />
     </label>
 
     <form v-if="editing" @submit.prevent="rename">
