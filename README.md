@@ -1,5 +1,5 @@
 # vue3-todo-app
-## Add, delete, rename todos with API
+## Add, delete, rename (`with double click`) todos with API
 
 [DEMO LINK](https://taraselnik.github.io/vue-todo-app/)
 
