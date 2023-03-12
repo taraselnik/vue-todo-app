@@ -57,8 +57,8 @@ export default {
 
 <template>
   <div class="todo" :class="{ completed: todo.completed }">
-    <label class="todo__status-label">
-      <button class="todo__status" :checked="todo.completed" @click="toggle"></button>
+    <label class="todo__status-label" @click="toggle">
+      <button class="todo__status" :checked="todo.completed" ></button>
     </label>
 
     <form v-if="editing" @submit.prevent="rename">
