@@ -11,12 +11,11 @@ export default {
     return {
       editing: false,
       newTitle: this.todo.title,
-      itemStatus: this.todo.completed
+      itemStatus: false
     }
   },
   methods: {
     toggle() {
-      this.itemStatus = !this.itemStatus
       this.$emit('update', {
         ...this.todo,
         completed: !this.todo.completed
@@ -59,9 +58,9 @@ export default {
 </script>
 
 <template>
-  <div class="todo" :class="{ completed: itemStatus }">
+  <div class="todo" :class="{ completed: todo.completed }">
     <label class="todo__status-label">
-      <input type="checkbox" class="todo__status" :checked="todo.completed" @change="toggle" @touchstart="toggle" />
+      <input type="checkbox" class="todo__status" :checked="todo.completed" @change="toggle" />
     </label>
 
     <form v-if="editing" @submit.prevent="rename">
