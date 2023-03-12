@@ -10,7 +10,7 @@ export default {
   data() {
     return {
       editing: false,
-      newTitle: this.todo.title,
+      newTitle: this.todo.title
     }
   },
   methods: {
@@ -51,7 +51,6 @@ export default {
     escapeFocused() {
       this.editing = false
     }
-
   }
 }
 </script>
@@ -59,7 +58,7 @@ export default {
 <template>
   <div class="todo" :class="{ completed: todo.completed }">
     <label class="todo__status-label">
-      <input type="checkbox" class="todo__status" :checked="todo.completed" @change="toggle" />
+      <button class="todo__status" :checked="todo.completed" @click="toggle"></button>
     </label>
 
     <form v-if="editing" @submit.prevent="rename">
