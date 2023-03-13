@@ -18,6 +18,8 @@ export default {
       errorMessage: '',
       todosBeforeToggle: [],
       isLoaded: false,
+      idLoadedComponent: null,
+      isAllLoading:false
     }
   },
   computed: {
@@ -76,9 +78,15 @@ export default {
       this.titleNewTodo = ''
     },
 
-    updateTodo({ id, title, completed }) {
-      updateTodo({ id, title, completed }).then((res) => {
+    async updateTodo({ id, title, completed }, state = false) {
+      this.idLoadedComponent = id;
+      this.isAllLoading = state;
+      console.log('IN', this.idLoadedComponent)
+      await updateTodo({ id, title, completed }).then((res) => {
         this.todos = this.todos.map((todo) => (todo.id === id ? res.data : todo))
+        this.idLoadedComponent = null;
+        this.isAllLoading = false;
+        console.log('OUT', this.idLoadedComponent)
       })
     },
 
@@ -87,9 +95,9 @@ export default {
     },
 
     deleteAllCompleted() {
-      this.todos.forEach(async (todo) => {
+      this.todos.forEach((todo) => {
         if (todo.completed) {
-          await this.deleteTodo(todo.id)
+          this.deleteTodo(todo.id)
         }
       })
     },
@@ -111,7 +119,7 @@ export default {
       }
       console.log(this.todos)
       this.todos.forEach(async (todo) => {
-        await updateTodo(todo)
+        await this.updateTodo(todo, true)
       })
     }
   }
@@ -145,6 +153,8 @@ export default {
           v-for="todo of visibleTodos"
           :key="todo.id"
           :todo="todo"
+          :idLoadedComponent="idLoadedComponent"
+          :isAllLoading="isAllLoading"
           @update="updateTodo"
           @remove="deleteTodo(todo.id)"
         />

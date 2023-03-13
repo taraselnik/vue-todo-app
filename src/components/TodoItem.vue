@@ -4,14 +4,15 @@ export default {
   props: {
     todo: {
       type: Object
-    }
+    },
+    idLoadedComponent: Number,
+    isAllLoading: Boolean
   },
   emits: ['update', 'remove'],
   data() {
     return {
       editing: false,
       newTitle: this.todo.title,
-      itemStatus: false
     }
   },
   methods: {
@@ -52,7 +53,6 @@ export default {
     escapeFocused() {
       this.editing = false
     }
-
   }
 }
 </script>
@@ -80,6 +80,11 @@ export default {
       <span class="todo__title" @click="edit"> {{ todo.title }}</span>
       <button class="todo__remove" @click="deleteTodo">x</button>
     </template>
+
+    <div class="modal overlay" :class="{'is-active': (this.todo.id === idLoadedComponent) || isAllLoading}">
+      <div class="modal-background has-background-white-ter"></div>
+      <div class="loader"></div>
+    </div>
   </div>
 </template>
 
