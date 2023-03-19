@@ -73,7 +73,7 @@ export default {
         @keyup.esc="escapeFocused"
         @blur="escapeFocused"
       />
-      <button class="todo__remove" @mousedown="rename">save</button>
+      <button class="todo__remove save" @mousedown="rename">save</button>
     </form>
 
     <template v-else>

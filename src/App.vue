@@ -145,6 +145,7 @@ export default {
             placeholder="What needs to be done?"
             v-model.trim="titleNewTodo"
           />
+          <button v-if="titleNewTodo" class="todo__remove save" @mousedown="handleSubmit">save</button>
         </form>
       </header>
 
